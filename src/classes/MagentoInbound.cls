@@ -38,10 +38,36 @@ global class MagentoInbound
             system.debug('Order Line Items Request: ' + orderLineItemRequests);
             system.debug('Product Request: ' + productRequests);
             
+            Map<String, String> jsonMapRequest = new Map<String, String>();
+
             // TODO: Implement logic here
             if(orderRequests != null)
             {
-                IDataAccess dAccess = new OpportunityDataAccess();
+            	for(String str : orderRequests)
+            	{
+            		IDataAccess dAccess = new OpportunityDataAccess();
+	                JSONParser parser = JSON.createParser(str);
+	                
+	                String fieldName = '';
+	                String fieldValue = '';
+			        while (parser.nextToken() != null) 
+			        {
+			            if(parser.getCurrentToken() == JSONToken.VALUE_STRING){jsonMapRequest.put(parser.getCurrentName(), parser.getText());}			            
+			            parser.nextToken();			     
+			        }
+            	}
+            	system.debug('TEMO ' + jsonMapRequest);
+            	
+            	MetadataService.CustomObject customObject = new MetadataService.CustomObject();
+				customObject.fullName = 'Test__c';
+				customObject.label = 'Test';
+				customObject.pluralLabel = 'Tests';
+				customObject.nameField = new MetadataService.CustomField();
+				customObject.nameField.type_x = 'Text';
+				customObject.nameField.label = 'Test Record';
+				customObject.deploymentStatus = 'Deployed';
+				customObject.sharingModel = 'ReadWrite';
+				MetadataService.AsyncResult[] results = service.create(new List<MetadataService.Metadata> { customObject });
             }
             
             GeneralResponse gr = new GeneralResponse();
